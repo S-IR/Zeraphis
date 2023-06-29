@@ -46,6 +46,10 @@ const AuthenticatePage: NextPage = () => {
   });
 
   useEffect(() => {
+    if (formSchema.safeParse(form).success) setForm(form as AuthFormOption);
+  }, []);
+
+  useEffect(() => {
     if (form !== router.query.form) {
       const currentUrl = new URL(
         router.asPath,
@@ -127,7 +131,7 @@ const AuthenticatePage: NextPage = () => {
               <animated.div
                 ref={absoluteElementRef}
                 style={style}
-                className="absolute left-0 top-0 z-10 h-auto w-full  bg-[#13472D] !bg-opacity-100"
+                className="absolute left-0 top-0 z-10 h-auto w-full  rounded-b-xl bg-[#13472D] !bg-opacity-100"
               >
                 {item === "login" ? <Login /> : <SignUp />}
               </animated.div>

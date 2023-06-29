@@ -11,6 +11,7 @@ import bcrypt from "bcrypt";
 import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { api } from "~/utils/api";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -22,18 +23,20 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
-      profileImage: string;
-      emailConfirmed: Date | null;
+      image: string;
+      emailVerified: Date | null;
       // ...other properties
       // role: UserRole;
     } & DefaultSession["user"];
   }
 
   interface User {
-    profileImage: string | null;
-    emailConfirmed: Date | null;
+    image: string | null;
+    emailVerified: Date | null;
   }
 }
+
+export type AuthOption = "credentials" | "google" | "discord";
 
 /**
  * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
@@ -42,16 +45,33 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-        profileImage: user.profileImage,
-        emailConfirmed: user.emailConfirmed,
-      },
-    }),
+    session: ({ session, user }) => {
+      console.log("session", session, "usr", user);
+
+      if (user !== undefined) {
+        return {
+          ...session,
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          emailVerified: user.emailVerified,
+        };
+      } else {
+        return { ...session };
+      }
+    },
+
+    // signIn: async ({ user, account, profile }) => {
+    //   console.log(user); // user data
+    //   console.log(account); // provider account data
+    //   console.log(profile); // raw profile data from provider
+    //   return true; // return true to continue the sign in process
+    // },
   },
+  session: {
+    strategy: "jwt",
+  },
+
   adapter: PrismaAdapter(prisma),
   providers: [
     DiscordProvider({
@@ -67,17 +87,17 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Enail", type: "text", placeholder: "" },
+        email: { label: "Email", type: "text", placeholder: "" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
         if (!credentials) return null;
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
         if (!user || user.password === null) {
           // If the user doesn't exist, return null to indicate a failed authentication
-          return Promise.resolve(null);
+          return null;
         }
         // Add logic here to look up the user from the credentials supplied
         const isPasswordValid = await bcrypt.compare(
@@ -85,15 +105,19 @@ export const authOptions: NextAuthOptions = {
           user.password
         );
         if (isPasswordValid) {
-          return Promise.resolve({
+          const userData = {
             id: user.id,
             name: user.name,
             email: user.email,
-            profileImage: user.image, // assuming user.image is the profile image
-            emailConfirmed: user.emailVerified, // assuming emailVerified indicates email confirmation
-          });
+            image: user.image, // assuming user.image is the profile image
+            emailVerified: user.emailVerified, // assuming emailVerified indicates email confirmation
+          };
+
+          return Promise.resolve(userData);
         } else {
-          return Promise.resolve(null);
+          console.log("no valid ");
+
+          return null;
         }
       },
     }),
@@ -110,7 +134,8 @@ export const authOptions: NextAuthOptions = {
   ],
 
   pages: {
-    signIn: "/authenticate",
+    signIn: "/",
+    signOut: "/authenticate?form=login",
   },
 };
 

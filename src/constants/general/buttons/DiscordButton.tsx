@@ -1,6 +1,7 @@
 import { FacebookOutlined, Google } from "@mui/icons-material";
 import React from "react";
 import { FcGoogle } from "react-icons/fc";
+import { BsDiscord } from "react-icons/bs";
 
 interface props {
   text: string;
@@ -28,19 +29,19 @@ const widthObj = {
  * A component styled after the Google login button
 
  */
-const GoogleButton = ({ text, onClick, w, h, disabled }: props) => {
+const DiscordButton = ({ text, onClick, w, h, disabled }: props) => {
   return (
     <button
       onClick={onClick}
       disabled={disabled}
       className={` flex ${w ? widthObj[w] : `w-56`} ${
         h ? heightObj[h] : "h-18"
-      }  rounded-md bg-white p-2 font-['Helvetica'] text-black/60 transition-all duration-300 hover:text-black disabled:bg-gray-600  `}
+      }  rounded-md bg-[#5865F2] p-2 font-['Helvetica'] text-white transition-all duration-300 hover:text-purple-300  disabled:bg-[#15183a]  `}
     >
-      <FcGoogle className="mr-2 h-6 w-6" />
+      <BsDiscord className="mr-2 h-6 w-6" />
       <p>{text}</p>
     </button>
   );
 };
 
-export default GoogleButton;
+export default DiscordButton;

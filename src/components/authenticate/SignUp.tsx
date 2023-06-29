@@ -48,8 +48,10 @@ const SignUp = () => {
         void reset();
         await signIn("credentials", data);
         toast.success(
-          "Successfully signed in. Redirecting you to the main page"
+          "Successfully signed in. Redirecting you to the main page",
+          { duration: 3000 }
         );
+        await new Promise((resolve) => setTimeout(resolve, 3000));
         return router.push("/");
       },
       onError: async (data) => {
@@ -60,18 +62,19 @@ const SignUp = () => {
   const onSubmit = async ({
     email,
     password,
+
     username = undefined,
   }: SignUpFormInputs) => void mutate({ email, password, username });
 
   return (
-    <div className="flex h-auto min-h-[90vh] w-full flex-col items-center  space-y-14 ">
+    <div className="flex h-auto min-h-[80vh] w-full flex-col items-center  space-y-14 ">
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="flex w-full flex-col items-center justify-center gap-5 space-y-6 pt-10 align-middle"
       >
         <div className="flex h-12 w-full flex-col items-center justify-center space-y-2 align-middle">
           <input
-            className="focus:shadow-outline  w-1/2 appearance-none rounded bg-green-950 px-3 py-2  leading-tight text-gray-700 transition-all duration-300 focus:bg-green-700  focus:outline-none"
+            className="focus:shadow-outline  w-1/2 appearance-none rounded bg-green-950 px-3 py-2  leading-tight text-green-200 transition-all duration-300 placeholder:text-gray-700 focus:bg-green-700  focus:outline-none"
             {...register("username")}
             placeholder="Username (optional)"
           />
@@ -81,7 +84,7 @@ const SignUp = () => {
         </div>
         <div className="flex h-12 w-full flex-col items-center justify-center space-y-2 align-middle">
           <input
-            className="focus:shadow-outline  w-1/2 appearance-none rounded bg-green-950 px-3 py-2  leading-tight text-gray-700 transition-all duration-300 focus:bg-green-700  focus:outline-none"
+            className="focus:shadow-outline  w-1/2 appearance-none rounded bg-green-950 px-3 py-2  leading-tight text-green-200 transition-all duration-300 placeholder:text-gray-700 focus:bg-green-700  focus:outline-none"
             {...register("email")}
             placeholder="Email"
           />
@@ -92,7 +95,7 @@ const SignUp = () => {
 
         <div className="flex h-12 w-full flex-col items-center justify-center space-y-2 align-middle">
           <input
-            className="focus:shadow-outlin duration-300e w-1/2 appearance-none rounded bg-green-950 px-3  py-2 leading-tight text-gray-700 transition-all focus:bg-green-700  focus:outline-none"
+            className="focus:shadow-outlin duration-300e w-1/2 appearance-none rounded bg-green-950 px-3  py-2 leading-tight text-green-200 transition-all placeholder:text-gray-700 focus:bg-green-700  focus:outline-none"
             {...register("password")}
             type="password"
             placeholder="Password"
@@ -103,7 +106,7 @@ const SignUp = () => {
         </div>
         <div className="flex h-12 w-full flex-col items-center justify-center space-y-2 align-middle">
           <input
-            className="focus:shadow-outlin duration-300e w-1/2 appearance-none rounded bg-green-950 px-3  py-2 leading-tight text-gray-700 transition-all focus:bg-green-700  focus:outline-none"
+            className="focus:shadow-outlin duration-300e w-1/2 appearance-none rounded bg-green-950 px-3  py-2 leading-tight text-green-200 transition-all placeholder:text-gray-700 focus:bg-green-700  focus:outline-none"
             {...register("confirmPassword")}
             type="password"
             placeholder="Confirm Password"
@@ -114,11 +117,11 @@ const SignUp = () => {
         </div>
 
         <button
-          className="focus:shadow-outline  w-48 rounded bg-green-800 px-4 py-2 font-handwriting font-bold text-white transition-all duration-300 hover:bg-green-700 focus:bg-green-700 focus:outline-none disabled:bg-gray-800"
+          className="focus:shadow-outline flex w-48 items-center justify-center rounded bg-green-800 px-4 py-2 align-middle font-handwriting font-bold text-white transition-all duration-300 hover:bg-green-700 focus:bg-green-700 focus:outline-none disabled:bg-gray-800"
           type="submit"
           disabled={isRegistering}
         >
-          {isRegistering ? <PuffLoader size={12} /> : `Sign In`}
+          {isRegistering ? <PuffLoader size={20} /> : `Sign In`}
         </button>
       </form>
       <GoogleButton

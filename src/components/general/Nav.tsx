@@ -8,6 +8,7 @@ import type { Session } from "next-auth";
 import PuffLoader from "react-spinners/PuffLoader";
 import { config, useTransition, animated } from "react-spring";
 import ProfileDropdown from "./ProfileDropdown";
+import { duration } from "@mui/material";
 export type navDropdown = "profile";
 const renderProfileIcon = (
   status: "authenticated" | "loading" | "unauthenticated",
@@ -15,8 +16,10 @@ const renderProfileIcon = (
 ) => {
   switch (status) {
     case "authenticated":
-      if (sessionData === null || !sessionData.user.image) {
+      if (sessionData === null) {
         return <PuffLoader size={40} />;
+      } else if (!sessionData.user.image) {
+        return <AccountCircle width={40} height={40} />;
       } else {
         return (
           <Image
@@ -38,18 +41,21 @@ const renderProfileIcon = (
 };
 
 const Nav = () => {
-  const session = useSession();
   const [dropdown, setDropdown] = useState<null | "profile">(null);
+  const session = useSession();
 
   const [transitions, api] = useTransition(dropdown, () => ({
     from: { opacity: 0 },
     enter: { opacity: 1 },
     leave: { opacity: 0 },
-    config: config.gentle,
+    config: { ...config.gentle, duration: 200 },
   }));
   useEffect(() => {
     api.start();
   }, [dropdown]);
+  useEffect(() => {
+    console.log("session", session);
+  }, [session]);
 
   return (
     <nav className="sticky left-0 top-0 flex h-[75px] items-center justify-center gap-64 ">
@@ -64,12 +70,27 @@ const Nav = () => {
           </Link>
         ))}
       </div>
-      <button
-        onMouseEnter={() => setDropdown("profile")}
-        className="ml-auto mr-3"
-      >
-        {renderProfileIcon(session.status, session.data)}
-      </button>
+      {session.status === "authenticated" ? (
+        <button
+          onMouseEnter={() => {
+            if (session.status === "authenticated") setDropdown("profile");
+          }}
+          className="ml-auto mr-3"
+        >
+          {renderProfileIcon(session.status, session.data)}
+        </button>
+      ) : (
+        <div className="ml-auto mr-16 flex space-x-16 font-handwriting">
+          <Link href={"/authenticate?form=sign-up"}>
+            <span>Sign Up</span>
+          </Link>
+
+          <Link href={"/authenticate?form=login"}>
+            <span>Login</span>
+          </Link>
+        </div>
+      )}
+
       {transitions((style, item) => (
         <animated.div
           style={style}
