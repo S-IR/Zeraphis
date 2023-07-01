@@ -8,7 +8,7 @@ import IconButton from "@mui/material/IconButton";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { PuffLoader } from "react-spinners";
-import { signIn, useSession } from "next-auth/react";
+import { getSession, signIn, useSession } from "next-auth/react";
 import { toast } from "react-hot-toast";
 import { AuthOption } from "~/server/auth";
 import DiscordButton from "~/constants/general/buttons/DiscordButton";
@@ -49,11 +49,9 @@ const Login = () => {
         break;
       default:
         signIn(option)
-          // .then(() => {
-          //   toast.success(
-          //     `Successfully logged in through ${option}. Redirecting you to the main page`
-          //   );
-          // })
+          .then(async () => {
+            if (option === "google") void (await getSession());
+          })
           .catch((error) => {
             toast.error(error.message ?? error);
           })

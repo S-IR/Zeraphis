@@ -5,8 +5,6 @@ import Link from "next/link";
 import { api } from "~/utils/api";
 
 export default function Home() {
-  const hello = api.example.hello.useQuery({ text: "from tRPC" });
-
   return (
     <>
       <Head>
@@ -61,18 +59,18 @@ export default function Home() {
                 y2="161"
                 gradientUnits="userSpaceOnUse"
               >
-                <stop stop-color="#CD9142" />
-                <stop offset="0.973958" stop-color="#E0B777" />
+                <stop stopColor="#CD9142" />
+                <stop offset="0.973958" stopColor="#E0B777" />
               </linearGradient>
             </defs>
           </svg>
         </div>
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 overflow-clip rounded-full shadow-2xl shadow-gray-300">
+        <div className="absolute right-0 top-1/2 -z-10 -translate-y-1/2 overflow-clip rounded-full shadow-2xl shadow-gray-300">
           <Image
             src={"/homepage/banner1.png"}
             width={512}
             height={512}
-            alt={"Bammer homepage for arabic"}
+            alt={"Banner homepage for arabic"}
           />
         </div>
       </main>

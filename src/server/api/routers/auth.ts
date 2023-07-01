@@ -34,7 +34,7 @@ export const authRouter = createTRPCRouter({
       // Hash the password
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      const newUser = await ctx.prisma.user.create({
+      await ctx.prisma.user.create({
         data: { email, name: username, password: hashedPassword },
       });
       return { email, password };

@@ -3,12 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { navLinks } from "~/constants/general/navConstants";
-import { useSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 import type { Session } from "next-auth";
 import PuffLoader from "react-spinners/PuffLoader";
 import { config, useTransition, animated } from "react-spring";
 import ProfileDropdown from "./ProfileDropdown";
 import { duration } from "@mui/material";
+import { useRouter } from "next/router";
 export type navDropdown = "profile";
 const renderProfileIcon = (
   status: "authenticated" | "loading" | "unauthenticated",
@@ -42,6 +43,7 @@ const renderProfileIcon = (
 
 const Nav = () => {
   const [dropdown, setDropdown] = useState<null | "profile">(null);
+  const router = useRouter();
   const session = useSession();
 
   const [transitions, api] = useTransition(dropdown, () => ({
@@ -56,12 +58,21 @@ const Nav = () => {
   useEffect(() => {
     console.log("session", session);
   }, [session]);
-
+  useEffect(() => {
+    const bla = async () => {
+      const ses = await getSession();
+      console.log("ses", ses);
+    };
+    bla();
+  }, [session]);
   return (
-    <nav className="sticky left-0 top-0 flex h-[75px] items-center justify-center gap-64 ">
-      <div className="mx-4 flex h-full items-center">
-        <Image alt={"Zeraphis logo"} src={"/logo.png"} width={75} height={75} />
-      </div>
+    <nav className="sticky left-0 top-0 z-50 flex h-[75px] items-center justify-center gap-64 ">
+      <button
+        onClick={() => router.push("/")}
+        className="mx-4 flex h-[50px] items-center rounded-full transition-all duration-300 hover:bg-white/5"
+      >
+        <Image alt={"Zeraphis logo"} src={"/logo.png"} width={50} height={50} />
+      </button>
 
       <div className="mx-4 flex w-auto items-center space-x-32">
         {navLinks.map((nav) => (
@@ -79,6 +90,8 @@ const Nav = () => {
         >
           {renderProfileIcon(session.status, session.data)}
         </button>
+      ) : session.status === "loading" ? (
+        <PuffLoader size={20} />
       ) : (
         <div className="ml-auto mr-16 flex space-x-16 font-handwriting">
           <Link href={"/authenticate?form=sign-up"}>

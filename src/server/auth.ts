@@ -23,7 +23,8 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
-      image: string;
+      email: string;
+      image?: string;
       emailVerified: Date | null;
       // ...other properties
       // role: UserRole;
@@ -45,20 +46,27 @@ export type AuthOption = "credentials" | "google" | "discord";
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session: ({ session, user }) => {
-      console.log("session", session, "usr", user);
-
-      if (user !== undefined) {
-        return {
-          ...session,
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          emailVerified: user.emailVerified,
-        };
-      } else {
-        return { ...session };
+    jwt: async ({ token, user }) => {
+      if (user) {
+        token.id = user.id;
+        token.name = user.name;
+        token.email = user.email;
+        token.emailVerified = user.emailVerified;
       }
+      return token;
+    },
+
+    session: ({ session, token }) => {
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.id,
+          name: token.name,
+          email: token.email,
+          emailVerified: token.emailVerified,
+        },
+      };
     },
 
     // signIn: async ({ user, account, profile }) => {
@@ -70,6 +78,9 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: "jwt",
+  },
+  jwt: {
+    secret: env.JWT_SECRET,
   },
 
   adapter: PrismaAdapter(prisma),
@@ -132,7 +143,7 @@ export const authOptions: NextAuthOptions = {
      * @see https://next-auth.js.org/providers/github
      */
   ],
-
+  secret: env.JWT_SECRET,
   pages: {
     signIn: "/",
     signOut: "/authenticate?form=login",
