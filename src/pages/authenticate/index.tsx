@@ -41,12 +41,12 @@ const AuthenticatePage: NextPage = () => {
 
   const sectionStyles = useSpring({
     from: { height: "50vh" },
-    to: { height: height > 0 ? Math.max(height, 75) + "vh" : "50vh" },
+    to: { height: height > 0 ? `${Math.max(height, 75)}vh` : "50vh" },
     config: config.stiff,
   });
 
   useEffect(() => {
-    if (formSchema.safeParse(form).success) setForm(form as AuthFormOption);
+    if (formSchema.safeParse(form).success) setForm(form);
   }, []);
 
   useEffect(() => {
@@ -63,7 +63,7 @@ const AuthenticatePage: NextPage = () => {
       }
 
       const newPath = `${currentUrl.pathname}?${params.toString()}`;
-      router.push(newPath, undefined, { shallow: true });
+      void router.push(newPath, undefined, { shallow: true });
     }
   }, [form]);
 

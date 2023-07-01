@@ -9,9 +9,6 @@ interface props {
 }
 const ProfileDropdown = ({ dropdown, setDropdown }: props) => {
   const session = useSession();
-  useEffect(() => {
-    console.log("session", session);
-  }, [session]);
 
   const router = useRouter();
   return (
@@ -35,19 +32,19 @@ const ProfileDropdown = ({ dropdown, setDropdown }: props) => {
       )}
 
       <button
-        onClick={() => router.push(`/profile`)}
+        onClick={() => void router.push(`/profile`)}
         className="h-10 w-full text-xl shadow-sm shadow-black transition-all duration-300 hover:text-yellow-300 hover:shadow-none   "
       >
         Profile
       </button>
       <button
-        onClick={() => router.push("/about-us")}
+        onClick={() => void router.push("/about-us")}
         className="h-10 w-full text-xl shadow-sm shadow-black transition-all duration-300 hover:text-yellow-300 hover:shadow-none   "
       >
         About Us
       </button>
       <button
-        onClick={() => signOut({ callbackUrl: "/authenticate" })}
+        onClick={() => void signOut({ callbackUrl: "/authenticate" })}
         className="h-10 w-full text-xl shadow-sm shadow-black transition-all duration-300 hover:text-yellow-300 hover:shadow-none   "
       >
         Logout

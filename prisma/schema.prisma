@@ -77,7 +77,7 @@ model User {
     id                String            @id @default(cuid())
     password          String?
     name              String?
-    email             String?           @unique
+    email             String            @unique
     emailVerified     DateTime?
     image             String?           @db.VarChar(2048)
     accounts          Account[]

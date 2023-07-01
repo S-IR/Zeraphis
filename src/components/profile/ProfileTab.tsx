@@ -128,7 +128,7 @@ const ProfileTab = () => {
               </button>
               <p className="w-min transition-all duration-300 ">{data.email}</p>
               <p className=" w-min  whitespace-nowrap transition-all duration-300 ">
-                {date === undefined && time === undefined ? (
+                {date === undefined || time === undefined ? (
                   <PuffLoader />
                 ) : (
                   `${date} : ${time}`
@@ -209,11 +209,11 @@ const ProfileTab = () => {
             } username `}
           </DialogContentText>
           <form
-            onSubmit={handleSubmit((e) => mutateUsername(e))}
+            onSubmit={void handleSubmit((e) => void mutateUsername(e))}
             className="flex w-full flex-col items-center justify-center gap-5 space-y-6 pt-10 align-middle"
           >
             <input
-              className="focus:shadow-outlin duration-300e w-1/2 appearance-none rounded bg-green-950 px-3  py-2 leading-tight text-green-200 transition-all placeholder:text-gray-700 focus:bg-green-700  focus:outline-none"
+              className=" duration-300e w-1/2 appearance-none rounded bg-green-950 px-3  py-2 leading-tight text-green-200 transition-all placeholder:text-gray-700 focus:bg-green-700  focus:outline-none"
               {...register("newUsername")}
               type="text"
               placeholder="New Username"
@@ -222,7 +222,7 @@ const ProfileTab = () => {
               <p className="text-red-200">{errors.newUsername.message}</p>
             )}
             <button
-              className="focus:shadow-outline flex w-48 items-center justify-center rounded bg-green-800 px-4 py-2 align-middle font-serif  text-white transition-all duration-300 hover:bg-green-700 focus:bg-green-700 focus:outline-none disabled:bg-gray-800"
+              className="flex w-48 items-center justify-center rounded bg-green-800 px-4 py-2 align-middle font-serif  text-white transition-all duration-300 hover:bg-green-700 focus:bg-green-700 focus:outline-none disabled:bg-gray-800"
               type="submit"
               disabled={isMutatingUsername}
             >

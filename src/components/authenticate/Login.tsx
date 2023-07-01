@@ -42,7 +42,7 @@ const Login = () => {
               "Successfully logged in. Redirecting you to the main page"
             );
           })
-          .catch((error) => {
+          .catch((error: any) => {
             toast.error(error.message ?? error);
           })
           .finally(() => setIsLoggingIn(false));
@@ -52,7 +52,7 @@ const Login = () => {
           .then(async () => {
             if (option === "google") void (await getSession());
           })
-          .catch((error) => {
+          .catch((error: any) => {
             toast.error(error.message ?? error);
           })
           .finally(() => setIsLoggingIn(false));
@@ -77,7 +77,9 @@ const Login = () => {
       ) : (
         <>
           <form
-            onSubmit={handleSubmit((data) => handleLogin("credentials", data))}
+            onSubmit={
+              void handleSubmit((data) => void handleLogin("credentials", data))
+            }
             className="flex w-full flex-col items-center justify-center gap-5 align-middle"
           >
             <div className="mt-8 flex w-full flex-col items-center">

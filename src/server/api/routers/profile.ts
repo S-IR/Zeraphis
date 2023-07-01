@@ -89,7 +89,7 @@ export const profileRouter = createTRPCRouter({
         where: { id: ctx.session.user.id },
         data: { name: input.newUsername },
       });
-      return name;
+      return name as string;
     }),
   changeProfileVisibility: protectedProcedure
     .input(

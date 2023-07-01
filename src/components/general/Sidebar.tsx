@@ -26,7 +26,7 @@ const Sidebar = () => {
     <animated.section
       style={sidebarStyles}
       className={`${
-        !visible && `ml-2`
+        !visible ? `ml-2` : ""
       } absolute left-0 top-[75px] z-50 flex h-auto min-h-[95vh]  flex-col items-center space-y-24 rounded-r-3xl bg-black/20  `}
     >
       <button

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,9 +9,11 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { api } from "~/utils/api";
 import { PuffLoader } from "react-spinners";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { useRouter } from "next/router";
 import { toast } from "react-hot-toast";
+import { AuthOption } from "~/server/auth";
+import DiscordButton from "~/constants/general/buttons/DiscordButton";
 
 const signUpSchema = z
   .object({
@@ -32,6 +34,8 @@ const signUpSchema = z
   });
 type SignUpFormInputs = z.infer<typeof signUpSchema>;
 const SignUp = () => {
+  const [isThirdPartySignUp, setIsThirdPartySignUp] = useState(false);
+
   const router = useRouter();
 
   const {
@@ -54,22 +58,33 @@ const SignUp = () => {
         await new Promise((resolve) => setTimeout(resolve, 3000));
         return router.push("/");
       },
-      onError: async (data) => {
+      onError: (data) => {
         return toast.error(data.message);
       },
     });
 
-  const onSubmit = async ({
+  const onSubmit = ({
     email,
     password,
 
     username = undefined,
   }: SignUpFormInputs) => void mutate({ email, password, username });
+  const handleThirdPartyLogin = (option: AuthOption) => {
+    setIsThirdPartySignUp(true);
 
+    signIn(option)
+      .then(async () => {
+        if (option === "google") void (await getSession());
+      })
+      .catch((error: any) => {
+        toast.error(error.message ?? error);
+      })
+      .finally(() => setIsThirdPartySignUp(false));
+  };
   return (
     <div className="flex h-auto min-h-[80vh] w-full flex-col items-center  space-y-14 ">
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={void handleSubmit(onSubmit)}
         className="flex w-full flex-col items-center justify-center gap-5 space-y-6 pt-10 align-middle"
       >
         <div className="flex h-12 w-full flex-col items-center justify-center space-y-2 align-middle">
@@ -95,7 +110,7 @@ const SignUp = () => {
 
         <div className="flex h-12 w-full flex-col items-center justify-center space-y-2 align-middle">
           <input
-            className="focus:shadow-outlin duration-300e w-1/2 appearance-none rounded bg-green-950 px-3  py-2 leading-tight text-green-200 transition-all placeholder:text-gray-700 focus:bg-green-700  focus:outline-none"
+            className=" duration-300e w-1/2 appearance-none rounded bg-green-950 px-3  py-2 leading-tight text-green-200 transition-all placeholder:text-gray-700 focus:bg-green-700  focus:outline-none"
             {...register("password")}
             type="password"
             placeholder="Password"
@@ -106,7 +121,7 @@ const SignUp = () => {
         </div>
         <div className="flex h-12 w-full flex-col items-center justify-center space-y-2 align-middle">
           <input
-            className="focus:shadow-outlin duration-300e w-1/2 appearance-none rounded bg-green-950 px-3  py-2 leading-tight text-green-200 transition-all placeholder:text-gray-700 focus:bg-green-700  focus:outline-none"
+            className="duration-300e w-1/2 appearance-none rounded bg-green-950 px-3  py-2 leading-tight text-green-200 transition-all placeholder:text-gray-700 focus:bg-green-700  focus:outline-none"
             {...register("confirmPassword")}
             type="password"
             placeholder="Confirm Password"
@@ -119,16 +134,27 @@ const SignUp = () => {
         <button
           className="focus:shadow-outline flex w-48 items-center justify-center rounded bg-green-800 px-4 py-2 align-middle font-handwriting font-bold text-white transition-all duration-300 hover:bg-green-700 focus:bg-green-700 focus:outline-none disabled:bg-gray-800"
           type="submit"
-          disabled={isRegistering}
+          disabled={isRegistering || isThirdPartySignUp}
         >
-          {isRegistering ? <PuffLoader size={20} /> : `Sign In`}
+          {isRegistering || isThirdPartySignUp ? (
+            <PuffLoader size={20} />
+          ) : (
+            `Sign In`
+          )}
         </button>
       </form>
-      <GoogleButton
-        onClick={() => console.log("hello world")}
-        text={"Sign up with Google"}
-        disabled={isRegistering}
-      />
+      <div className="flex h-auto w-full items-center justify-center space-x-8 align-middle">
+        <GoogleButton
+          onClick={() => handleThirdPartyLogin("google")}
+          text={"Sign up with Google"}
+          disabled={isRegistering || isThirdPartySignUp}
+        />
+        <DiscordButton
+          onClick={() => handleThirdPartyLogin("google")}
+          text={"Sign up with Google"}
+          disabled={isRegistering || isThirdPartySignUp}
+        />
+      </div>
     </div>
   );
 };

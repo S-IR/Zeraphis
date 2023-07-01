@@ -46,7 +46,7 @@ export type AuthOption = "credentials" | "google" | "discord";
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    jwt: async ({ token, user }) => {
+    jwt: ({ token, user }) => {
       if (user) {
         token.id = user.id;
         token.name = user.name;
@@ -126,8 +126,6 @@ export const authOptions: NextAuthOptions = {
 
           return Promise.resolve(userData);
         } else {
-          console.log("no valid ");
-
           return null;
         }
       },

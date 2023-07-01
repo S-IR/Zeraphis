@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "./server/auth";
 
-export async function middleware(req: NextRequest) {
+export function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
   const protectedPaths = ["/arabic/", "/koine-greek", "/hebrew"];
   const isPathProtected = protectedPaths?.some((path) => pathname == path);

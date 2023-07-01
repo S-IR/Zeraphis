@@ -64,7 +64,7 @@ const ProfilePage: NextPage<{
     <>
       <NextSeo
         title={username ? `Profile : ${username}` : `Profile`}
-        description={`Profile page for ${data.email}`}
+        description={`Profile page for ${data.email ?? "user"}`}
       />
       <main className="i mt-24 flex h-[calc(100vh-75px-96px)] w-full overflow-clip rounded-t-3xl border-2 border-yellow-600/20">
         <section className="flex h-full w-3/12 flex-col items-center justify-center  bg-[##15291F] bg-[#15291F] align-middle">
@@ -135,7 +135,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
 
-  const ssg = await generateSSGHelper(session);
+  const ssg = generateSSGHelper(session);
   await ssg.profile.getByIdPrivate.prefetch({
     userId: session.user.id,
   });

@@ -25,7 +25,9 @@ const renderProfileIcon = (
         return (
           <Image
             src={sessionData.user.image}
-            alt={`Profile picture for ${sessionData.user.name} at ${sessionData.user.email}`}
+            alt={`Profile picture for ${sessionData.user.name ?? "user"} at ${
+              sessionData.user.email ?? "some email address"
+            }`}
             width={40}
             height={40}
             className="rounded-full"
@@ -55,20 +57,11 @@ const Nav = () => {
   useEffect(() => {
     api.start();
   }, [dropdown]);
-  useEffect(() => {
-    console.log("session", session);
-  }, [session]);
-  useEffect(() => {
-    const bla = async () => {
-      const ses = await getSession();
-      console.log("ses", ses);
-    };
-    bla();
-  }, [session]);
+
   return (
     <nav className="sticky left-0 top-0 z-50 flex h-[75px] items-center justify-center gap-64 ">
       <button
-        onClick={() => router.push("/")}
+        onClick={() => void router.push("/")}
         className="mx-4 flex h-[50px] items-center rounded-full transition-all duration-300 hover:bg-white/5"
       >
         <Image alt={"Zeraphis logo"} src={"/logo.png"} width={50} height={50} />
