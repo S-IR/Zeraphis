@@ -8,13 +8,13 @@ import {
 import bcrypt from "bcrypt";
 import { TRPCError } from "@trpc/server";
 
+export const usernameSchema = z
+  .string()
+  .min(4, "Username must be at least 4 characters long");
 const registerCredentialSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(8, "Password must be at least 8 characters long"),
-  username: z
-    .string()
-    .min(4, "Username must be at least 4 characters long")
-    .nullish(),
+  username: usernameSchema.nullish(),
 });
 export const authRouter = createTRPCRouter({
   registerCredential: publicProcedure

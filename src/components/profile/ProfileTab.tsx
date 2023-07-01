@@ -26,16 +26,12 @@ type ChangeUsername = z.infer<typeof changeUsernameSchema>;
 
 const ProfileTab = () => {
   const session = useSession();
-  const [modal, setModal] = useState<null | "profile" | "username">(null);
-  if (session.status !== "authenticated" || session.data === null)
-    return (
-      <div className="flex h-full w-full flex-col items-center justify-center align-middle">
-        <PuffLoader size={160} />
-      </div>
-    );
   const ctx = api.useContext();
+
+  const [modal, setModal] = useState<null | "profile" | "username">(null);
+
   const { data, isLoading } = api.profile.getByIdPrivate.useQuery({
-    userId: session.data?.user.id,
+    userId: session.data?.user.id as string,
   });
   const { mutate: mutateUsername, isLoading: isMutatingUsername } =
     api.profile.changeUsername.useMutation({
@@ -49,7 +45,6 @@ const ProfileTab = () => {
         toast.error("An error has occurred. Please try again later");
       },
     });
-
   const {
     register,
     handleSubmit,
@@ -80,6 +75,12 @@ const ProfileTab = () => {
     () => data?.createdAt.toLocaleTimeString(),
     [data?.createdAt]
   );
+  if (session.status !== "authenticated" || session.data === null)
+    return (
+      <div className="flex h-full w-full flex-col items-center justify-center align-middle">
+        <PuffLoader size={160} />
+      </div>
+    );
 
   return (
     <div className={`flex h-full w-full flex-col items-center align-middle `}>

@@ -22,6 +22,7 @@ import {
   StudiedLanguagesTab,
 } from "~/components/profile";
 import { useTransition, animated } from "react-spring";
+import { generateSSGHelper } from "~/utils/backend/trpc";
 
 type ProfileTab = "profile" | "flashcards" | "studied-languages" | "progress";
 
@@ -133,12 +134,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       props: { trpcState: { session: null } },
     };
   }
-  const ssg = createServerSideHelpers({
-    router: appRouter,
-    ctx: { prisma, session: null },
-    transformer: SuperJSON,
-  });
 
+  const ssg = await generateSSGHelper(session);
   await ssg.profile.getByIdPrivate.prefetch({
     userId: session.user.id,
   });
