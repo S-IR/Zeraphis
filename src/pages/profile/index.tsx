@@ -62,10 +62,10 @@ const ProfilePage: NextPage<{
   if (!data) return <div>404</div>;
   return (
     <>
-      <NextSeo
+      {/* <NextSeo
         title={username ? `Profile : ${username}` : `Profile`}
         description={`Profile page for ${data.email ?? "user"}`}
-      />
+      /> */}
       <main className="i mt-24 flex h-[calc(100vh-75px-96px)] w-full overflow-clip rounded-t-3xl border-2 border-yellow-600/20">
         <section className="flex h-full w-3/12 flex-col items-center justify-center  bg-[##15291F] bg-[#15291F] align-middle">
           <button

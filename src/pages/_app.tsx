@@ -14,11 +14,11 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
   return (
     <SessionProvider session={session}>
-      <DefaultSeo
+      {/* <DefaultSeo
         title="Zeraphis"
         description="website dedicated to learning languages for faiths"
         themeColor="#0F3120"
-        additionalLinkTags={[{ rel: "icon", href: "/favicon.ico" }]}
+        additionalLinkTags={[{ rel: "icon", href: "/favicon.ico" }]} 
         // openGraph={{
         //   type: "website",
         //   locale: "en_IE",
@@ -30,7 +30,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
         //   site: "@site",
         //   cardType: "summary_large_image",
         // }}
-      />
+      />*/}
       <Toaster />
       <Nav />
       <Sidebar />
