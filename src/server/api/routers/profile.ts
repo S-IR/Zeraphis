@@ -76,7 +76,12 @@ export const profileRouter = createTRPCRouter({
   changeUsername: protectedProcedure
     .input(
       z.object({
-        newUsername: usernameSchema,
+        newUsername: z
+          .string()
+          .min(
+            4,
+            "Username is too small, It needs to be at least 4 characters long"
+          ),
       })
     )
     .mutation(async ({ ctx, input }) => {
