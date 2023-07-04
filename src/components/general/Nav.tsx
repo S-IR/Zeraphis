@@ -8,7 +8,6 @@ import type { Session } from "next-auth";
 import PuffLoader from "react-spinners/PuffLoader";
 import { config, useTransition, animated } from "react-spring";
 import ProfileDropdown from "./ProfileDropdown";
-import { duration } from "@mui/material";
 import { useRouter } from "next/router";
 export type navDropdown = "profile";
 const renderProfileIcon = (
@@ -70,7 +69,9 @@ const Nav = () => {
       <div className="mx-4 flex w-auto items-center space-x-32">
         {navLinks.map((nav) => (
           <Link href={nav.href} key={nav.href}>
-            <span className="font-serif">{nav.name}</span>
+            <span className="font-serif transition-all duration-300 hover:text-yellow-300">
+              {nav.name}
+            </span>
           </Link>
         ))}
       </div>

@@ -1,5 +1,5 @@
 export const navLinks = [
-  { name: "Alphabets", href: "/alphabets/arabic" },
-  { name: "Texts", href: "/texts/arabic" },
-  { name: "Videos", href: "/videos/arabic" },
+  { name: "Writing System", href: "/arabic/writing-system" },
+  { name: "Study Texts", href: "/arabic/texts" },
+  { name: "Videos", href: "/arabic/videos" },
 ] as const;
