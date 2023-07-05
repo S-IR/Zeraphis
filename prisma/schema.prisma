@@ -5,6 +5,7 @@ model Language {
     id         String      @id @default(cuid())
     flashcards Flashcard[]
     progress   Int?
+    wsProgress Int?
     arUser     User?       @relation("ar", fields: [arId], references: [id])
     arId       String?     @unique
     hbUser     User?       @relation("hb", fields: [hbid], references: [id])
@@ -97,102 +98,10 @@ model User {
     @@index([id, email])
 }
 
-model ArabicText {
-    textId  Int               @id @default(autoincrement())
-    quran   Quran?
-    hadiths HadithCollection?
-}
-
 model VerificationToken {
     identifier String
     token      String   @unique
     expires    DateTime
 
     @@unique([identifier, token])
-}
-
-model QuranVerse {
-    id               Int          @id @default(autoincrement())
-    chNumber         Int          @default(1)
-    verseChNumber    Int          @default(1)
-    verseQuranNumber Int          @unique
-    arText           String
-    enText           String
-    transliteration  String
-    audioURL         QuranAudio[]
-    chapter          QuranChapter @relation(fields: [chNumber], references: [chNumber])
-
-    @@index([chNumber])
-}
-
-model QuranAudio {
-    id      Int        @id @default(autoincrement())
-    url     String
-    verse   QuranVerse @relation(fields: [verseId], references: [id])
-    verseId Int
-
-    @@index([verseId])
-}
-
-model QuranChapter {
-    id            Int          @id @default(autoincrement())
-    chNumber      Int          @unique
-    arChapterName String
-    enChapterName String
-    verses        QuranVerse[]
-    quranId       Int
-    quran         Quran        @relation(fields: [quranId], references: [id])
-
-    @@index([quranId])
-}
-
-model Quran {
-    id         Int            @id @default(autoincrement())
-    arabicText ArabicText     @relation(fields: [id], references: [textId])
-    chapters   QuranChapter[]
-
-    @@index([id])
-}
-
-enum HadithAuthor {
-    bukhari
-    muslim
-    nasai
-    abudawud
-    tirmidhi
-    ibnmajah
-}
-
-model Hadith {
-    id              Int        @id @default(autoincrement())
-    textDifficulty  Int
-    enText          String
-    arText          String
-    reference       String
-    inBookReference String
-    bookName        String
-    authorName      String
-    book            HadithBook @relation(fields: [bookName], references: [bookName])
-
-    @@index([bookName])
-}
-
-model HadithBook {
-    id         Int          @id @default(autoincrement())
-    bookName   String       @unique
-    arBookName String
-    enBookName String
-    hadiths    Hadith[]
-    author     HadithAuthor
-    authorName String
-
-    @@index([id])
-    @@map("matches")
-}
-
-model HadithCollection {
-    textId     Int        @id @default(autoincrement())
-    arabicText ArabicText @relation(fields: [textId], references: [textId])
-
-    @@index([textId])
 }

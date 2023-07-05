@@ -31,7 +31,7 @@ const Sidebar = () => {
     >
       <button
         onClick={() => toggle((v) => !v)}
-        className="group absolute right-0 top-6 flex h-12 w-12 translate-x-1/2 items-center justify-center rounded-full bg-[#0F3120] align-middle transition-all duration-300 hover:bg-green-950"
+        className="group absolute right-0 top-6 flex h-12 w-12 translate-x-1/2 items-center justify-center rounded-full bg-[#203C2E] align-middle transition-all duration-300 hover:bg-green-950"
       >
         <Menu
           htmlColor={`${visible ? "#D6A45C" : `#D6A45C`}`}

@@ -4,15 +4,6 @@ import Link from "next/link";
 import React, { useEffect } from "react";
 
 const Page: NextPage = () => {
-  useEffect(() => {
-    const fetchData = async () => {
-      const res = await fetch("/api/getQuran");
-      const json = await res.json();
-      console.log("json", json);
-    };
-    fetchData();
-  }, []);
-
   return (
     <div className="relative flex h-[calc(100vh-75px)] w-full flex-col items-center   space-y-28 align-middle ">
       <div className="absolute -top-[75px] left-0 -z-10  h-screen  w-screen   ">
@@ -39,7 +30,7 @@ const Page: NextPage = () => {
           Start Over
         </Link>
         <Link
-          href={"/arabic/texts"}
+          href={"/arabic/writing-system/test"}
           className="flex h-64 w-80 items-center justify-center rounded-2xl bg-gradient-to-b from-white  to-[#D6A45C] text-center align-middle text-4xl  text-black shadow-sm shadow-white transition-all duration-300 hover:text-gray-700 hover:shadow-none"
         >
           Take a <br></br> test

@@ -7,14 +7,25 @@ import Nav from "~/components/general/Nav";
 import Sidebar from "~/components/general/Sidebar";
 import { Toaster } from "react-hot-toast";
 import { DefaultSeo } from "next-seo";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
 }) => {
+  const oneHour = 1000 * 60 * 60;
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+        staleTime: oneHour,
+      },
+    },
+  });
   return (
-    <SessionProvider session={session}>
-      {/* <DefaultSeo
+    <QueryClientProvider client={queryClient}>
+      <SessionProvider session={session}>
+        {/* <DefaultSeo
         title="Zeraphis"
         description="website dedicated to learning languages for faiths"
         themeColor="#0F3120"
@@ -31,11 +42,12 @@ const MyApp: AppType<{ session: Session | null }> = ({
         //   cardType: "summary_large_image",
         // }}
       />*/}
-      <Toaster />
-      <Nav />
-      <Sidebar />
-      <Component {...pageProps} />
-    </SessionProvider>
+        <Toaster />
+        <Nav />
+        <Sidebar />
+        <Component {...pageProps} />
+      </SessionProvider>
+    </QueryClientProvider>
   );
 };
 

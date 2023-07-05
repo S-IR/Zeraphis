@@ -5,24 +5,11 @@ import axios from "axios";
 import { transliterateArabic } from "~/utils/backend/arabic";
 import { number, z } from "zod";
 import { transliterate } from "transliteration";
-
-const verseSchema = z.object({
-  chNumber: z.number().min(1),
-  verseChNumber: z.number().min(1),
-  verseQuranNumber: z.number().min(1),
-  arText: z.string().min(1),
-  enText: z.string().min(1),
-  transliteration: z.string().min(1),
-  audioURL: z.array(z.string()).nonempty(),
-});
-
-type QuranVerseData = z.infer<typeof verseSchema>;
-type QuranChapterData = {
-  arChapterName: string;
-  enChapterName: string;
-  verses: QuranVerseData[];
-};
-type QuranData = QuranChapterData[];
+import {
+  QuranData,
+  QuranVerseData,
+  verseSchema,
+} from "~/constants/arabic/texts";
 
 export default async function handler(
   req: NextApiRequest,

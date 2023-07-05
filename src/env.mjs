@@ -7,8 +7,22 @@ export const env = createEnv({
    * isn't built with invalid env vars.
    */
   server: {
+    DISCORD_CLIENT_ID: z.string().min(1),
+    DISCORD_CLIENT_SECRET: z.string().min(1),
+    GOOGLE_CLIENT_ID: z.string().min(1),
+    GOOGLE_CLIENT_SECRET: z.string().min(1),
+    JWT_SECRET: z.string().length(64, "Length of JWT string is not 64"),
+    AWS_ACCESS_KEY_ID: z.string().min(1),
+    AWS_SECRET_ACCESS_KEY: z.string().min(1),
     DATABASE_URL: z.string().url(),
     NODE_ENV: z.enum(["development", "test", "production"]),
+    AWS_REGION: z
+      .string()
+      .refine(
+        (str) => str === "eu-central-1",
+        "The region of the AWS is not eu-central-1 (frankfurt). Since every other part of the server runs there at this point you should change it to this region"
+      ),
+
     NEXTAUTH_SECRET:
       process.env.NODE_ENV === "production"
         ? z.string().min(1)
@@ -20,12 +34,11 @@ export const env = createEnv({
       // VERCEL_URL doesn't include `https` so it cant be validated as a URL
       process.env.VERCEL ? z.string().min(1) : z.string().url()
     ),
+
+    NEXT_PUBLIC_WS_TEST_QUESTION_COUNT: z
+      .number()
+      .or(z.string().regex(/^\d+$/)),
     // Add `.min(1) on ID and SECRET if you want to make sure they're not empty
-    DISCORD_CLIENT_ID: z.string().min(1),
-    DISCORD_CLIENT_SECRET: z.string().min(1),
-    GOOGLE_CLIENT_ID: z.string().min(1),
-    GOOGLE_CLIENT_SECRET: z.string().min(1),
-    JWT_SECRET: z.string().length(64, "Length of JWT string is not 64"),
   },
 
   /**
@@ -51,6 +64,11 @@ export const env = createEnv({
     DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
     DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
     JWT_SECRET: process.env.JWT_SECRET,
+    AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
+    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
+    AWS_REGION: process.env.AWS_REGION,
+    NEXT_PUBLIC_WS_TEST_QUESTION_COUNT:
+      process.env.NEXT_PUBLIC_WS_TEST_QUESTION_COUNT,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.
