@@ -23,7 +23,7 @@ const determineButtonStatus = (
 };
 
 const Page: NextPage = () => {
-  const { data, status, update } = useSession();
+  const { status, data, update } = useSession();
   const { data: questions } = api.arabic.quizzes.getWSQuiz.useQuery();
   const [ignoreUnauthenticated, toggleIgnore] = useState(false);
   const wrongLettersMap = new Map<string, number>();
@@ -32,7 +32,7 @@ const Page: NextPage = () => {
   );
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  let wrongAnswers = 0;
+  let wrongAnswersCount = 0;
   const [isTimeoutActive, setIsTimeoutActive] = useState(false);
 
   useEffect(() => {
@@ -44,7 +44,7 @@ const Page: NextPage = () => {
 
   useEffect(() => {
     console.log(`wrongLettersMap`, wrongLettersMap);
-  }, [wrongAnswers]);
+  }, [wrongAnswersCount]);
 
   const transitions = useTransition(
     currentQuestion === undefined ? "" : currentQuestion.text,
@@ -114,6 +114,11 @@ const Page: NextPage = () => {
     setIsTimeoutActive(true);
 
     setTimeout(() => {
+      if (
+        questions !== undefined &&
+        currentQuestionIndex >= questions.length - 1
+      ) {
+      }
       if (option !== currentQuestion.rightAnswer) {
         const wrongLetters = findDifferentLetters(
           currentQuestion[option],
@@ -127,7 +132,7 @@ const Page: NextPage = () => {
             wrongLettersMap.set(letter, count + 1);
           }
         });
-        wrongAnswers++;
+        wrongAnswersCount++;
       }
 
       setCurrentQuestionIndex((v) => v + 1);

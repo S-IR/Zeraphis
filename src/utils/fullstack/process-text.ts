@@ -18,3 +18,35 @@ export function findDifferentLetters(
   }
   return differentLetters;
 }
+
+export const arabicToIJMESMap = {
+  " ": " ",
+  ا: "a",
+  ب: "b",
+  ت: "t",
+  ث: "th",
+  ج: "j",
+  ح: "H",
+  خ: "kh",
+  د: "d",
+  ذ: "dh",
+  ر: "r",
+  ز: "z",
+  س: "s",
+  ش: "sh",
+  ص: "S",
+  ض: "D",
+  ط: "T",
+  ظ: "Z",
+  ع: "ʿ",
+  غ: "gh",
+  ف: "f",
+  ق: "q",
+  ك: "k",
+  ل: "l",
+  م: "m",
+  ن: "n",
+  ه: "h",
+  و: "w",
+  ي: "y",
+} as { [key: string]: string };
