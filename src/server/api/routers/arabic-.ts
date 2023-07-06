@@ -9,7 +9,7 @@ import bcrypt from "bcrypt";
 import { TRPCError } from "@trpc/server";
 import { arabicTextsRouter } from "./arabic/arabicTexts";
 import { arabicVideosRouter } from "./arabic/arabicVideos";
-import { arabicQuizzesRouter } from "./arabic/arabicQuizesRouter";
+import { arabicQuizzesRouter } from "./arabic/arabicQuizes";
 
 export const usernameSchema = z
   .string()

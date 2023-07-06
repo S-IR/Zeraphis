@@ -19,7 +19,7 @@ export function findDifferentLetters(
   return differentLetters;
 }
 
-export const arabicToIJMESMap = {
+export const arabicToLatinObj = {
   " ": " ",
   ا: "a",
   ب: "b",
@@ -49,4 +49,36 @@ export const arabicToIJMESMap = {
   ه: "h",
   و: "w",
   ي: "y",
+} as { [key: string]: string };
+
+export const latinToArabicObj = {
+  " ": " ",
+  a: "ا",
+  b: "ب",
+  t: "ت",
+  th: "ث",
+  j: "ج",
+  H: "ح",
+  kh: "خ",
+  d: "د",
+  dh: "ذ",
+  r: "ر",
+  z: "ز",
+  s: "س",
+  sh: "ش",
+  S: "ص",
+  D: "ض",
+  T: "ط",
+  Z: "ظ",
+  ʿ: "ع",
+  gh: "غ",
+  f: "ف",
+  q: "ق",
+  k: "ك",
+  l: "ل",
+  m: "م",
+  n: "ن",
+  h: "ه",
+  w: "و",
+  y: "ي",
 } as { [key: string]: string };

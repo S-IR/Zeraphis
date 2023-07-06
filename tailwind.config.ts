@@ -10,6 +10,7 @@ export default {
       display: ["Oswald"],
       body: ['"Open Sans"'],
       handwriting: ["Merienda"],
+      arabic: ["Amiri"],
     },
     extend: {},
   },

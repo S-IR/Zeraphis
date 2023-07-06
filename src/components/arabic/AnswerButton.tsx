@@ -73,10 +73,6 @@ const AnswerButton = ({ status, text, disabled, handleClick }: props) => {
     }
   }, [status]);
 
-  useEffect(() => {
-    console.log("isFlickering", isFlickering);
-  }, [isFlickering]);
-
   const buttonProps = useSpring({
     backgroundColor: status === null ? "#FFEC97" : color,
   });

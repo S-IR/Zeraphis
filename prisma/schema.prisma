@@ -9,7 +9,7 @@ model Language {
     arUser     User?       @relation("ar", fields: [arId], references: [id])
     arId       String?     @unique
     hbUser     User?       @relation("hb", fields: [hbid], references: [id])
-    hbid       String      @unique
+    hbid       String?     @unique
     knUser     User?       @relation("kn", fields: [knId], references: [id])
     knId       String?     @unique
 
@@ -28,13 +28,18 @@ enum ProfileVisibility {
 }
 
 model Flashcard {
-    id         String   @id @default(cuid())
-    front      String
-    back       String
-    dueTime    DateTime
-    language   Language @relation(fields: [languageId], references: [id])
-    languageId String
+    id             String    @unique @default(uuid())
+    front          String
+    back           String
+    interval       Float     @default(1)
+    repetition     Float     @default(0)
+    easinessFactor Float     @default(2.5)
+    lastReview     DateTime?
+    dueTime        DateTime  @default(now())
+    language       Language  @relation(fields: [languageId], references: [id])
+    languageId     String
 
+    @@index([id])
     @@index([languageId])
 }
 
