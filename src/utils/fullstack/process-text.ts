@@ -9,7 +9,7 @@ export function findDifferentLetters(
   string2: string
 ): Set<string> {
   const differentLetters = new Set<string>();
-  let loopEnd =
+  const loopEnd =
     string1.length < string2.length ? string2.length : string1.length;
   for (let i = 0; i < loopEnd; i++) {
     if (string1[i] !== string2[i]) {
