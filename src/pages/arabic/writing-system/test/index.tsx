@@ -207,6 +207,7 @@ const Page: NextPage = () => {
 
             return (
               <AnswerButton
+                key={option}
                 disabled={isTimeoutActive}
                 status={correctStatus}
                 text={currentQuestion[option]}

@@ -35,9 +35,9 @@ export const arabicQuizzesRouter = createTRPCRouter({
     .output(z.array(wsQuestionSchema))
     .query(async ({ ctx }) => {
       const wsQuestions: wsQuestion[] = [];
-      let accessesQuranChapters = new Set<number>();
+      const accessesQuranChapters = new Set<number>();
       // let accessesHadithChunks = new Set<number>()
-      let savedWords = new Set<string>();
+      const savedWords = new Set<string>();
 
       while (wsQuestions.length < 4) {
         console.log("wsQuestions.length", wsQuestions.length);
