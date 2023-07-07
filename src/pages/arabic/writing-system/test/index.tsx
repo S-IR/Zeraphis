@@ -48,7 +48,7 @@ const Page: NextPage = () => {
 
   const [testResults, setTestResults] = useState<null | {
     flashcards: FrontendFlashcard[];
-    finalScore: Number;
+    finalScore: number;
   }>(null);
 
   const { mutate: mutateUserScore, isLoading: isMutating } =
@@ -189,7 +189,8 @@ const Page: NextPage = () => {
             if (!map.has(letter)) {
               map.set(letter, 1);
             } else {
-              const count = map.get(letter) as number;
+              const count = map.get(letter);
+              if (!count) return;
               map.set(letter, count + 1);
             }
           });
@@ -288,7 +289,7 @@ const Page: NextPage = () => {
 export default Page;
 
 type scoreResultsProps = {
-  testResults: { flashcards: FrontendFlashcard[]; finalScore: Number };
+  testResults: { flashcards: FrontendFlashcard[]; finalScore: number };
 };
 const ScoreResults = ({
   testResults: { finalScore, flashcards },
@@ -333,14 +334,14 @@ const ScoreResults = ({
         />
         <h1 className="text-center ">
           <span className="text-4xl text-yellow-800 lg:text-6xl">
-            {finalScore >= (75 as Number)
+            {(finalScore as number) >= 75
               ? "Congratulations"
               : "You can do better!"}
           </span>
         </h1>
         <h2 className="text-2xl">
           {`You have ${
-            finalScore >= (75 as Number) ? "" : "only"
+            (finalScore as number) >= 75 ? "" : "only"
           } answered ${finalScore}%  of the questions correctly`}{" "}
         </h2>
         {data && data.user ? (
@@ -377,7 +378,10 @@ const ScoreResults = ({
             style={{ gridColumn: Math.min(flashcards.length, 6) }}
           >
             {flashcards.map((card) => (
-              <div className="flex h-32 w-32 items-center justify-center rounded-md bg-yellow-300 align-middle text-6xl">
+              <div
+                key={card.id}
+                className="flex h-32 w-32 items-center justify-center rounded-md bg-yellow-300 align-middle text-6xl"
+              >
                 {card.front}
               </div>
             ))}
