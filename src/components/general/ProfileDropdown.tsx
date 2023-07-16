@@ -33,19 +33,19 @@ const ProfileDropdown = ({ dropdown, setDropdown }: props) => {
 
       <button
         onClick={() => void router.push(`/profile`)}
-        className="h-10 w-full bg-yellow-400/30 text-xl transition-all  duration-300 hover:bg-yellow-400/60  hover:shadow-none  "
+        className="h-10 w-full bg-yellow-300/30 text-xl transition-all  duration-300 hover:bg-yellow-400/60  hover:shadow-none  "
       >
         Profile
       </button>
       <button
         onClick={() => void router.push("/about-us")}
-        className="h-10 w-full bg-yellow-200/30 text-xl transition-all duration-300 hover:bg-yellow-200  hover:shadow-none  "
+        className="h-10 w-full bg-yellow-100/30 text-xl transition-all duration-300 hover:bg-yellow-200  hover:shadow-none  "
       >
         About Us
       </button>
       <button
         onClick={() => void signOut({ callbackUrl: "/authenticate" })}
-        className="h-10 w-full bg-yellow-400/30 text-xl  transition-all duration-300 hover:bg-yellow-400/60   hover:shadow-none "
+        className="h-10 w-full bg-yellow-300/30 text-xl  transition-all duration-300 hover:bg-yellow-400/60   hover:shadow-none "
       >
         Logout
       </button>

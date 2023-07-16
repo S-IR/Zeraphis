@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { NextPage } from "next";
+import { GetServerSideProps, NextPage } from "next";
 import { useSession } from "next-auth/react";
 import { NextSeo } from "next-seo";
 import Image from "next/image";
@@ -17,99 +17,42 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
-
-const determineButtonStatus = (
-  option: QuizOptionIndex,
-  selectedAnswer: QuizOptionIndex | null,
-  rightAnswer: QuizOptionIndex
-): QuizButtonStatus => {
-  if (selectedAnswer === null) return null;
-  if (option === rightAnswer) return "correct";
-  if (selectedAnswer === option && option !== rightAnswer) return "incorrect";
-  return "neither-correct-nor-incorrect";
-};
+import { generateSSGHelper } from "~/utils/backend/trpc";
+import ArabicTest from "~/components/arabic/ArabicTest";
 
 const Page: NextPage = () => {
   const { status, data, update } = useSession();
-  const { data: questions } = api.arabic.quizzes.getWSQuiz.useQuery();
-  const [ignoreUnauthenticated, toggleIgnore] = useState(false);
-  const [wrongLettersMap, setWrongLettersMap] = useState<Map<string, number>>(
-    new Map<string, number>()
-  );
-
-  const [selectedAnswer, setSelectedAnswer] = useState<QuizOptionIndex | null>(
-    null
-  );
-
-  const queryClient = useQueryClient();
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [wrongAnswersCount, setWrongAnswersCount] = useState(0);
-  const [isTimeoutActive, setIsTimeoutActive] = useState(false);
-
+  const { data: infiniteData, fetchNextPage } =
+    api.arabic.quizzes.getWSQuiz.useInfiniteQuery(
+      { limit: 4 },
+      { getNextPageParam: (lastPage) => lastPage.nextCursor }
+    );
   const [testResults, setTestResults] = useState<null | {
     flashcards: FrontendFlashcard[];
     finalScore: number;
   }>(null);
 
-  const { mutate: mutateUserScore, isLoading: isMutating } =
-    api.arabic.quizzes.setUserScore.useMutation({
-      onSuccess: ({ flashcards, finalScore }) => {
-        const arabicFlashcards = queryClient.getQueryData<
-          FrontendFlashcard[] | undefined
-        >(["userArabicFlashcards"]);
-        if (arabicFlashcards === undefined) {
-          queryClient.setQueryData(["userArabicFlashcards"], flashcards);
-        } else {
-          arabicFlashcards.filter((existingCard) =>
-            flashcards.some(
-              (newCard) =>
-                newCard.front === existingCard.front &&
-                newCard.back === existingCard.back
-            )
-          );
-          queryClient.setQueryData(
-            ["userArabicFlashcards"],
-            [...arabicFlashcards, ...flashcards]
-          );
-        }
-        setTestResults({ flashcards, finalScore });
-      },
-      onError: () => {
-        toast.error(
-          "A server error has occurred while processing your request. Please try again later"
-        );
-      },
-    });
-  const currentQuestion =
-    questions === undefined ? undefined : questions[currentQuestionIndex];
+  infiniteData?.pageParams;
+  const [ignoreUnauthenticated, toggleIgnore] = useState(false);
 
-  useEffect(() => {
-    console.log(`wrongLettersMap`, wrongLettersMap);
-  }, [wrongAnswersCount]);
-  useEffect(() => {
-    console.log(`questions`, questions);
-  }, [questions]);
-  const transitions = useTransition(
-    currentQuestion === undefined ? "" : currentQuestion.text,
-    {
-      from: { opacity: 0, transform: `translateX(-30%) translateY(-50%)` },
-      enter: { opacity: 1, transform: `translateX(-50%) translateY(-50%)` },
-      leave: { opacity: 0, transform: `translateX(-70%) translateY(-50%)` },
-    }
-  );
   if (testResults !== null) return <ScoreResults testResults={testResults} />;
-
-  if (status === "loading" || currentQuestion === undefined)
+  if (infiniteData === undefined)
+    return (
+      <section className="flex h-screen w-screen items-center justify-center align-middle">
+        <PuffLoader size={40} />
+      </section>
+    );
+  if (status === "loading" || infiniteData === undefined)
     return (
       <main className="flex h-screen w-full items-center justify-center align-middle">
         <PuffLoader size={50} />
       </main>
     );
 
-  if ((status === "unauthenticated" && !ignoreUnauthenticated) || isMutating)
+  if (status === "unauthenticated" && !ignoreUnauthenticated)
     return (
       <main className="flex h-screen w-full items-center justify-center  align-middle">
-        <section className="relative flex h-[60vh] w-3/5 items-center justify-center overflow-clip rounded-xl border-4 border-green-900 bg-[#FDF0B6] align-middle">
+        <section className="relative flex h-[60vh] w-3/5 flex-col items-center justify-center overflow-clip rounded-xl border-4 border-green-900 bg-[#FDF0B6] align-middle text-black">
           <Image
             src={"/arabic/writing-system/test/greenflr.png"}
             alt={"green flower decoration for the page"}
@@ -142,69 +85,29 @@ const Page: NextPage = () => {
             height={225}
             className="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2"
           />
-          {isMutating ? (
-            <>
-              <h2 className="text-4xl">Please wait</h2>
-              <PuffLoader size={50} />
-            </>
-          ) : (
-            <>
-              <h1 className="text-4xl">
-                It seems like you do not have an account<br></br>
-                Your progress cannot be saved if you do not have an account{" "}
-                <br></br>
-                Do you wish to proceed anyway?
-              </h1>
-              <button
-                onClick={() => toggleIgnore(true)}
-                className="h-12 w-24 rounded-lg bg-orange-600"
-              >
-                Continue
-              </button>
-            </>
-          )}
+
+          <h1 className="text-center text-4xl">
+            <span className="text-yellow-800">
+              It seems like you do not have an account
+            </span>
+            <br></br>
+            Your progress cannot be saved if<br></br> you do not have an account{" "}
+            <br></br>
+          </h1>
+          <span className="my-8 text-4xl text-black/80">
+            {" "}
+            Do you wish to proceed anyway?
+          </span>
+
+          <button
+            onClick={() => toggleIgnore(true)}
+            className="h-12 w-24 rounded-sm bg-yellow-600 transition-all duration-300 hover:bg-yellow-400/50 "
+          >
+            Continue
+          </button>
         </section>
       </main>
     );
-
-  const handleButtonClick = (option: QuizOptionIndex) => {
-    setSelectedAnswer(option);
-    setIsTimeoutActive(true);
-
-    setTimeout(() => {
-      if (
-        questions !== undefined &&
-        currentQuestionIndex >= questions.length - 1
-      ) {
-        mutateUserScore({ wrongAnswersCount, wrongLettersMap });
-      }
-      if (option !== currentQuestion.rightAnswer) {
-        const wrongLetters = findDifferentLetters(
-          currentQuestion[option],
-          currentQuestion[currentQuestion.rightAnswer]
-        );
-
-        setWrongLettersMap((map) => {
-          wrongLetters.forEach((letter) => {
-            if (!map.has(letter)) {
-              map.set(letter, 1);
-            } else {
-              const count = map.get(letter);
-              if (!count) return;
-              map.set(letter, count + 1);
-            }
-          });
-          return map;
-        });
-
-        setWrongAnswersCount((v) => v + 1);
-      }
-
-      setCurrentQuestionIndex((v) => v + 1);
-      setSelectedAnswer(null);
-      setIsTimeoutActive(false);
-    }, 2000);
-  };
 
   return (
     <>
@@ -212,76 +115,11 @@ const Page: NextPage = () => {
         title="Test your Arabic Writing System Understanding"
         description="This is a test that allows you to determine how capable are you to read and understand arabic characters and map them to their equivalent latin alphabet constructions"
       />
-      <main className="mt-4 flex h-auto min-h-screen w-full flex-col items-center">
-        <h1 className="my-6 w-full text-center text-3xl ">
-          Click on the correct transliteration of the following letter / letters
-        </h1>
-        <section className="relative flex h-[60vh] w-3/5 items-center justify-center overflow-clip rounded-xl border-4 border-green-900 bg-[#FDF0B6] align-middle">
-          <Image
-            src={"/arabic/writing-system/test/greenflr.png"}
-            alt={"green flower decoration for the page"}
-            quality={100}
-            width={225}
-            height={225}
-            className="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2"
-          />
-          <Image
-            src={"/arabic/writing-system/test/greenflr.png"}
-            alt={"green flower decoration for the page"}
-            quality={100}
-            width={225}
-            height={225}
-            className="absolute right-0 top-0 -translate-y-1/2 translate-x-1/2"
-          />
-          <Image
-            src={"/arabic/writing-system/test/greenflr.png"}
-            alt={"green flower decoration for the page"}
-            quality={100}
-            width={225}
-            height={225}
-            className="absolute bottom-0 left-0 -translate-x-1/2 translate-y-1/2"
-          />
-          <Image
-            src={"/arabic/writing-system/test/greenflr.png"}
-            alt={"green flower decoration for the page"}
-            quality={100}
-            width={225}
-            height={225}
-            className="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2"
-          />
-          {transitions((styles, text) => (
-            <animated.span
-              style={styles}
-              className="spacing absolute left-1/2 top-1/2 font-arabic text-[192px]  tracking-wide text-black "
-            >
-              {text}
-            </animated.span>
-          ))}
-        </section>
-        <section className="flex h-24 w-3/5 overflow-visible">
-          {QuizOptionIndexes.map((option) => {
-            const correctStatus: QuizButtonStatus = determineButtonStatus(
-              option,
-              selectedAnswer,
-              currentQuestion.rightAnswer
-            );
-            const handleClick = () => {
-              // Call the onClick event handler and pass the option value
-              handleButtonClick(option);
-            };
-
-            return (
-              <AnswerButton
-                key={option}
-                disabled={isTimeoutActive}
-                status={correctStatus}
-                text={currentQuestion[option]}
-                handleClick={handleClick}
-              />
-            );
-          })}
-        </section>
-      </main>
+      <ArabicTest
+        setTestResults={setTestResults}
+        questions={infiniteData.pages.flatMap((page) => page.questions)}
+        fetchNextPage={fetchNextPage}
+      />
     </>
   );
 };
@@ -295,6 +133,8 @@ const ScoreResults = ({
   testResults: { finalScore, flashcards },
 }: scoreResultsProps) => {
   const { data } = useSession();
+
+  console.log("flashcards", flashcards);
 
   const [open, togglePopup] = useState(false);
   return (
@@ -374,8 +214,8 @@ const ScoreResults = ({
       >
         <Box className="!absolute !left-1/2 !top-1/2 !h-auto !w-auto !max-w-[50vw] !-translate-x-1/2 !-translate-y-1/2 !bg-gradient-to-br !from-white !to-yellow-200 !shadow-lg !shadow-black">
           <div
-            className={` grid h-auto w-auto grid-cols-4 `}
-            style={{ gridColumn: Math.min(flashcards.length, 6) }}
+            className={` grid h-auto w-auto  `}
+            style={{ gridColumn: Math.min(flashcards.length - 1, 6) }}
           >
             {flashcards.map((card) => (
               <div
@@ -391,3 +231,17 @@ const ScoreResults = ({
     </main>
   );
 };
+
+// export const getServerSideProps: GetServerSideProps = async (ctx) => {
+//   const ssg = generateSSGHelper();
+//   await ssg.arabic.quizzes.getWSQuiz.prefetchInfinite({
+//     limit: 4,
+//   });
+//   console.log("ssr ran");
+
+//   return {
+//     props: {
+//       trpcState: ssg.dehydrate(),
+//     } as const,
+//   };
+// };

@@ -7,6 +7,7 @@ export type QuranChapterData = {
 export type QuranData = QuranChapterData[];
 
 import { z } from "zod";
+import { QuizOptionIndexes } from "./quizzes";
 
 export const verseSchema = z.object({
   chNumber: z.number().min(1),
@@ -17,3 +18,4 @@ export const verseSchema = z.object({
   transliteration: z.string().min(1),
   audioURL: z.array(z.string()).nonempty(),
 });
+

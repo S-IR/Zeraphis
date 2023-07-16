@@ -36,7 +36,7 @@ const Login = () => {
     setIsLoggingIn(true);
     switch (option) {
       case "credentials":
-        signIn("credentials", { ...data, callbackUrl: "/" })
+        signIn("credentials", { ...data, callbackUrl: "/", redirect: false })
           .then(() => {
             toast.success(
               "Successfully logged in. Redirecting you to the main page"
@@ -77,9 +77,7 @@ const Login = () => {
       ) : (
         <>
           <form
-            onSubmit={
-              void handleSubmit((data) => void handleLogin("credentials", data))
-            }
+            onSubmit={handleSubmit((data) => handleLogin("credentials", data))}
             className="flex w-full flex-col items-center justify-center gap-5 align-middle"
           >
             <div className="mt-8 flex w-full flex-col items-center">

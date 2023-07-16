@@ -46,7 +46,9 @@ export type AuthOption = "credentials" | "google" | "discord";
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    jwt: ({ token, user }) => {
+    jwt: async ({ token, user }) => {
+      console.log('ran callback  code', user, token);
+
       if (user) {
         token.id = user.id;
         token.name = user.name;
@@ -57,10 +59,12 @@ export const authOptions: NextAuthOptions = {
     },
 
     session: ({ session, token }) => {
+      console.log('ran session code', session, token);
+      
       return {
         ...session,
         user: {
-          ...session.user,
+          ...(session.user || {}),
           id: token.id,
           name: token.name,
           email: token.email,
@@ -102,7 +106,13 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials) return null;
+        console.log('authorize Ran');
+        
+        if (!credentials) {
+        console.log('credentials are null');
+          
+          return null
+        }
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
@@ -126,6 +136,8 @@ export const authOptions: NextAuthOptions = {
 
           return Promise.resolve(userData);
         } else {
+          console.log("not valid password ");
+
           return null;
         }
       },

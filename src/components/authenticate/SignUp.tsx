@@ -36,8 +36,6 @@ type SignUpFormInputs = z.infer<typeof signUpSchema>;
 const SignUp = () => {
   const [isThirdPartySignUp, setIsThirdPartySignUp] = useState(false);
 
-  const router = useRouter();
-
   const {
     register,
     handleSubmit,
@@ -56,7 +54,7 @@ const SignUp = () => {
           { duration: 3000 }
         );
         await new Promise((resolve) => setTimeout(resolve, 3000));
-        return router.push("/");
+        // return router.push("/");
       },
       onError: (data) => {
         return toast.error(data.message);
@@ -68,7 +66,11 @@ const SignUp = () => {
     password,
 
     username = undefined,
-  }: SignUpFormInputs) => void mutate({ email, password, username });
+  }: SignUpFormInputs) => {
+    console.log("data", email, password, username);
+
+    return void mutate({ email, password, username });
+  };
   const handleThirdPartyLogin = (option: AuthOption) => {
     setIsThirdPartySignUp(true);
 
@@ -84,7 +86,7 @@ const SignUp = () => {
   return (
     <div className="flex h-auto min-h-[80vh] w-full flex-col items-center  space-y-14 ">
       <form
-        onSubmit={void handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(onSubmit)}
         className="flex w-full flex-col items-center justify-center gap-5 space-y-6 pt-10 align-middle"
       >
         <div className="flex h-12 w-full flex-col items-center justify-center space-y-2 align-middle">

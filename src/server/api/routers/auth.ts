@@ -20,6 +20,8 @@ export const authRouter = createTRPCRouter({
   registerCredential: publicProcedure
     .input(registerCredentialSchema)
     .mutation(async ({ input: { email, password, username }, ctx }) => {
+      console.log('procedure reached');
+      
       const existingUser = await ctx.prisma.user.findUnique({
         where: { email },
       });

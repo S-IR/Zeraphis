@@ -37,23 +37,39 @@ import {
 
 export const arabicQuizzesRouter = createTRPCRouter({
   getWSQuiz: publicProcedure
-    .output(z.array(wsQuestionSchema))
-    .query(async ({ ctx }) => {
-      const wsQuestions: wsQuestion[] = [];
+    .input(
+      z.object({
+        limit: z.number().positive().int(),
+        cursor: z.set(z.string()).optional(),
+      })
+    )
+    .output(
+      z.object({
+        questions: z.array(wsQuestionSchema),
+        nextCursor: z.set(z.string()).optional(),
+      })
+    )
+    .query(async ({ ctx, input: { limit = 4, cursor } }) => {
+      const questions: wsQuestion[] = [];
       const accessesQuranChapters = new Set<number>();
       // let accessesHadithChunks = new Set<number>()
-      const savedWords = new Set<string>();
-      console.log(
-        "NEXT_PUBLIC_WS_TEST_QUESTION_COUNT",
-        process.env.NEXT_PUBLIC_WS_TEST_QUESTION_COUNT
-      );
+      const fetchedWords = cursor ?? new Set<string>();
 
+      console.log('starting for loop');
+      let batchWordsCount = 0
       while (
-        wsQuestions.length <
-        Number(process.env.NEXT_PUBLIC_WS_TEST_QUESTION_COUNT) - 1
+        questions.length < limit &&
+        fetchedWords.size <
+          Number(process.env.NEXT_PUBLIC_WS_TEST_QUESTION_COUNT) - 1
       ) {
-        console.log("wsQuestions.length", wsQuestions.length);
-
+        console.log(
+          `questions.length`,
+          questions.length,
+          `limit`,
+          limit,
+          "etchedWords.size",
+          fetchedWords.size
+        );
         const chapterNumber = Math.max(1, Math.floor(Math.random() * 115));
         if (accessesQuranChapters.has(chapterNumber)) continue;
         accessesQuranChapters.add(chapterNumber);
@@ -82,12 +98,15 @@ export const arabicQuizzesRouter = createTRPCRouter({
         if (randomWords.size === 0) continue;
 
         randomWords.forEach((text) => {
-          if (savedWords.has(text)) return;
+          if (fetchedWords.has(text)) return;
           if (
-            savedWords.size >=
-            Number(process.env.NEXT_PUBLIC_WS_TEST_QUESTION_COUNT) - 1
-          )
+            fetchedWords.size >=
+            Number(process.env.NEXT_PUBLIC_WS_TEST_QUESTION_COUNT) ||
+            batchWordsCount >= limit
+          ){
             return;
+
+          }
           const transliteration = transliterate(text);
           const similarWords = generateSimilarStrings(transliteration, 3);
           const options = generateWSQuizOptions(transliteration, similarWords);
@@ -95,12 +114,15 @@ export const arabicQuizzesRouter = createTRPCRouter({
             text,
             ...options,
           };
-          savedWords.add(text);
-          wsQuestions.push(question);
+          console.log('pushing word', text);
+          
+          fetchedWords.add(text);
+          questions.push(question);
+          batchWordsCount++
         });
       }
 
-      return wsQuestions;
+      return { questions, nextCursor: fetchedWords };
     }),
   setUserScore: protectedProcedure
     .input(ArabicWSScoreSchema)

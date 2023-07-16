@@ -47,6 +47,10 @@ const Nav = () => {
   const router = useRouter();
   const session = useSession();
 
+  useEffect(() => {
+    console.log("session", session);
+  }, [session]);
+
   const [transitions, api] = useTransition(dropdown, () => ({
     from: { opacity: 0 },
     enter: { opacity: 1 },

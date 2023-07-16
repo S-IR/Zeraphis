@@ -10,6 +10,7 @@ import { TRPCError } from "@trpc/server";
 import { arabicTextsRouter } from "./arabic/arabicTexts";
 import { arabicVideosRouter } from "./arabic/arabicVideos";
 import { arabicQuizzesRouter } from "./arabic/arabicQuizes";
+import { arabicVoiceLinesRouter } from "./arabic/arabicVoiceLines";
 
 export const usernameSchema = z
   .string()
@@ -19,4 +20,5 @@ export const arabicRouter = createTRPCRouter({
   texts: arabicTextsRouter,
   quizzes: arabicQuizzesRouter,
   videos: arabicVideosRouter,
+  voiceLines : arabicVoiceLinesRouter,
 });

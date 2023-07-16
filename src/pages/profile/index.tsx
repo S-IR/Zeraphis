@@ -12,7 +12,6 @@ import { appRouter } from "~/server/api/root";
 import { prisma } from "~/server/db";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { getServerAuthSession } from "~/server/auth";
-import SuperJSON from "superjson";
 import { useSession } from "next-auth/react";
 import { NextSeo } from "next-seo";
 import {
@@ -23,6 +22,9 @@ import {
 } from "~/components/profile";
 import { useTransition, animated } from "react-spring";
 import { generateSSGHelper } from "~/utils/backend/trpc";
+import { createTRPCContext } from "~/server/api/trpc";
+import SuperJSON from "superjson";
+import { PuffLoader } from "react-spinners";
 
 type ProfileTab = "profile" | "flashcards" | "studied-languages" | "progress";
 
@@ -43,9 +45,12 @@ const ProfilePage: NextPage<{
   userId: string;
   username: string | undefined;
 }> = ({ userId, username }) => {
-  const { data, isLoading } = api.profile.getByIdPrivate.useQuery({
-    userId,
-  });
+  const { data, isLoading } = api.profile.getByIdPrivate.useQuery(
+    {
+      userId,
+    },
+    { staleTime: 3600 * 24 }
+  );
   const [tab, setTab] = useState<ProfileTab>("profile");
 
   const handleTabSwitch = (
@@ -57,15 +62,15 @@ const ProfilePage: NextPage<{
     enter: { opacity: 1 },
     leave: { opacity: 0 },
   });
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <PuffLoader size={40} />;
 
   if (!data) return <div>404</div>;
   return (
     <>
-      {/* <NextSeo
+      <NextSeo
         title={username ? `Profile : ${username}` : `Profile`}
         description={`Profile page for ${data.email ?? "user"}`}
-      /> */}
+      />
       <main className="i mt-24 flex h-[calc(100vh-75px-96px)] w-full overflow-clip rounded-t-3xl border-2 border-yellow-600/20">
         <section className="flex h-full w-3/12 flex-col items-center justify-center  bg-[##15291F] bg-[#15291F] align-middle">
           <button
@@ -128,6 +133,11 @@ export default ProfilePage;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const session = await getServerAuthSession(ctx);
+  const ssg = createServerSideHelpers({
+    transformer: SuperJSON,
+    router: appRouter,
+    ctx: { prisma, session },
+  });
 
   if (session === null) {
     return {
@@ -135,10 +145,18 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
 
-  const ssg = generateSSGHelper(session);
+  // const ssg = generateSSGHelper(session);
+
+  const userData = await ssg.profile.getByIdPrivate.fetch({
+    userId: session.user.id,
+  });
+
+  console.log("userData", userData);
+
   await ssg.profile.getByIdPrivate.prefetch({
     userId: session.user.id,
   });
+  console.log("getServerSideProps prefetchResult", ssg.dehydrate()); // to inspect prefetch result
 
   return {
     props: {
