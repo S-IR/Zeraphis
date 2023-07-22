@@ -12,6 +12,7 @@ interface props {
   text: string;
   handleClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   disabled: boolean;
+  bgColor? : BGColor 
 }
 
 const determineColor = (correct: QuizButtonStatus | null) => {
@@ -27,6 +28,15 @@ const determineColor = (correct: QuizButtonStatus | null) => {
   }
 };
 
+type BGColor = 'cyan' | 'yellow' 
+const determineBGColor = (color :BGColor)=>{
+  switch(color){
+    case 'cyan':
+      return 'bg-[#9DD]'
+    case 'yellow':
+      return 
+    }
+}
 const getShadow = (isFlickering: boolean, status: QuizButtonStatus) => {
   if (isFlickering) {
     return `0px 0px 12px 12px ${
@@ -39,8 +49,9 @@ const getShadow = (isFlickering: boolean, status: QuizButtonStatus) => {
   }
 };
 
-const AnswerButton = ({ status, text, disabled, handleClick }: props) => {
+const AnswerButton = ({ status, text, disabled, handleClick , bgColor = 'cyan'}: props) => {
   const color = determineColor(status);
+  const tailwindBGColor = determineBGColor(bgColor)
   const [isFlickering, setIsFlickering] = useState(false);
 
   useEffect(() => {
@@ -91,7 +102,7 @@ const AnswerButton = ({ status, text, disabled, handleClick }: props) => {
       onClick={handleClick}
       disabled={disabled}
       className={
-        "group relative flex flex-grow items-center justify-center rounded-xl bg-[#FFEC97]  align-middle transition-all duration-300"
+        `group relative flex flex-grow items-center justify-center rounded-xl  align-middle transition-all duration-300 ${tailwindBGColor} `
       }
       style={buttonProps}
     >

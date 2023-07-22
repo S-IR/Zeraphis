@@ -13,6 +13,7 @@ import { FrontendFlashcard } from "~/constants/flashcards";
 import { api } from "~/utils/api";
 import { findDifferentLetters } from "~/utils/fullstack/process-text";
 import AnswerButton, { QuizButtonStatus } from "./AnswerButton";
+import { determineButtonStatus } from "~/utils/frontend/tests";
 
 interface props {
   questions: wsQuestion[];
@@ -25,16 +26,6 @@ interface props {
   fetchNextPage: () => Promise<unknown>;
 }
 
-const determineButtonStatus = (
-  option: QuizOptionIndex,
-  selectedAnswer: QuizOptionIndex | null,
-  rightAnswer: QuizOptionIndex
-): QuizButtonStatus => {
-  if (selectedAnswer === null) return null;
-  if (option === rightAnswer) return "correct";
-  if (selectedAnswer === option && option !== rightAnswer) return "incorrect";
-  return "neither-correct-nor-incorrect";
-};
 const ArabicTest = ({ questions, setTestResults, fetchNextPage }: props) => {
   const [wrongLettersMap, setWrongLettersMap] = useState<Map<string, number>>(
     new Map<string, number>()
@@ -99,8 +90,6 @@ const ArabicTest = ({ questions, setTestResults, fetchNextPage }: props) => {
 
     setTimeout(() => {
       if (questions !== undefined && (currentQuestionIndex + 2) % 4 === 0) {
-        console.log("fetching next page");
-
         fetchNextPage();
       }
       if (

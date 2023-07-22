@@ -47,10 +47,6 @@ const Nav = () => {
   const router = useRouter();
   const session = useSession();
 
-  useEffect(() => {
-    console.log("session", session);
-  }, [session]);
-
   const [transitions, api] = useTransition(dropdown, () => ({
     from: { opacity: 0 },
     enter: { opacity: 1 },
@@ -70,7 +66,7 @@ const Nav = () => {
         <Image alt={"Zeraphis logo"} src={"/logo.png"} width={50} height={50} />
       </button>
 
-      <div className="mx-4 flex w-auto items-center space-x-32">
+      <div className="mx-4 flex w-1/2 items-center space-x-32">
         {navLinks.map((nav) => (
           <Link href={nav.href} key={nav.href}>
             <span className="font-serif transition-all duration-300 hover:text-yellow-300">

@@ -75,15 +75,16 @@ export const arabicQuizzesRouter = createTRPCRouter({
         accessesQuranChapters.add(chapterNumber);
         console.log("chapterNumber", chapterNumber);
 
-        const quranParams: GetObjectRequest = {
+        const quranParams = {
           Bucket: "zeraphis-arabic-texts",
           Key: `quran/chapter-${chapterNumber}.json`,
         };
-        const response = await s3API.getObject(quranParams).promise();
+        const command = new GetObjectCommand(quranParams)
+        const response = await s3API.send(command)
 
         if (response.Body === undefined) break;
         const { verses } = JSON.parse(
-          response.Body.toString("utf-8")
+          await response.Body.transformToString("utf-8")
         ) as QuranChapterData; // Convert data from a Buffer to a String
 
         const { arText } = verses[

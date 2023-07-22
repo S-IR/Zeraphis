@@ -7,7 +7,7 @@ import {
 
 import { TRPCError } from "@trpc/server";
 import { QuizOptionIndexes } from "~/constants/arabic/quizzes";
-import { getDrawingSlides, getQuizSlides } from "~/utils/backend/arabic-ws";
+import { addURLToSlide, getDrawingSlides, getQuizSlides } from "~/utils/backend/arabic-ws";
 import { arabicLetters } from "~/constants/arabic/writing-system";
 
 export const introductionSlideSchema = z.object({
@@ -18,13 +18,15 @@ export const introductionSlideSchema = z.object({
   audioURL: z.string().min(1).nullish(),
   transliteration: z.string().min(1),
 });
-
+export type IntroductionSlide = z.infer<typeof introductionSlideSchema>
 export const drawingSlideSchema = z.object({
   type: z.enum(["drawing", "pronunciation"]),
   symbol: z.string().min(1),
   audioURL: z.string().min(1).nullish(),
   transliteration: z.string().min(1),
 });
+export type DrawingSlide = z.infer<typeof drawingSlideSchema>
+
 export const quizQuestionSchema = z.object({
   type: z.literal("quiz-question"),
   symbol: z.string().min(1),
@@ -33,9 +35,11 @@ export const quizQuestionSchema = z.object({
   b: z.string().min(1),
   c: z.string().min(1),
   d: z.string().min(1),
-  audioURL: z.string().min(1).nullish(),
+  audioURL: z.string().nullish(),
   rightAnswer: z.enum(QuizOptionIndexes),
 });
+export type QuizQuestionSlide = z.infer<typeof quizQuestionSchema>
+
 export const textQuestionSchema = z
   .object({
     type: z.literal("text-question"),
@@ -43,12 +47,14 @@ export const textQuestionSchema = z
     symbol: z.string().min(1),
     text: z.string().min(1),
     audioURL: z.string().min(1).nullish(),
-    rightAnswerIndex: z.number().positive(),
+    rightAnswerIndex: z.number().gte(0),
   })
   .refine((data) => data.rightAnswerIndex <= data.text.length, {
     message: "rightAnswerIndex can't be bigger than the length of the text",
     path: ["rightAnswerIndex"],
   });
+
+export type TextQuestionSlide = z.infer<typeof textQuestionSchema>
 
 const symbolSlideSchema = z.union([
   introductionSlideSchema,
@@ -56,7 +62,7 @@ const symbolSlideSchema = z.union([
   quizQuestionSchema,
   textQuestionSchema,
 ]);
-
+export type wsSlide = z.infer<typeof symbolSlideSchema>
 export const arabicTextsRouter = createTRPCRouter({
   getWSLearnSlides: publicProcedure
     .input(z.object({ requestedSymbolIndex: z.number() }))
@@ -81,11 +87,13 @@ export const arabicTextsRouter = createTRPCRouter({
       const drawLetters = getDrawingSlides(4, currentSymbol, previousLetters);
 
       const questions = getQuizSlides(currentSymbol);
-      const arr = [
+      let arr = await Promise.all([
         introductionPresentation,
         ...drawLetters,
         ...questions,
-      ];
+      ].map(async (obj)=> await addURLToSlide(obj)));
+      console.log('arr', arr);
+      
       z.array(symbolSlideSchema).parse(arr)
       
       return arr 

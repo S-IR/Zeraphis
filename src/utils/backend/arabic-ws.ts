@@ -1,10 +1,13 @@
-import { z } from "zod";
-import { drawingSlideSchema, quizQuestionSchema, textQuestionSchema } from "~/server/api/routers/arabic/arabicTexts";
+import { string, z } from "zod";
+import { drawingSlideSchema, quizQuestionSchema, textQuestionSchema, wsSlide } from "~/server/api/routers/arabic/arabicTexts";
 import { transliterate } from "transliteration";
 import { arabicLetters, symbolObjects } from "~/constants/arabic/writing-system";
 import { TRPCError } from "@trpc/server";
 import { generateSimilarStrings } from "./text-processing";
 import { generateWSQuizOptions } from "./arabic";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { s3API } from "aws-config";
 
 
 type DrawingSlide = z.infer<typeof drawingSlideSchema>
@@ -102,4 +105,21 @@ function shuffleArray(array: any[]): any[] {
     [array[i], array[randomIndex]] = [array[randomIndex], array[i]];
   }
   return array;
+}
+
+
+
+export const addURLToSlide= async(obj :wsSlide): Promise<wsSlide>=>{
+  const Bucket = "zeraphis-arabic-audio";
+  const Key = `learn-writing-system/${obj.symbol}.mp3`;
+
+
+
+  const presignCommand = new GetObjectCommand({ Bucket, Key });
+  const audioURL = await getSignedUrl(s3API, presignCommand, {
+    expiresIn: 3600,
+  });
+
+  return {...obj, audioURL}
+
 }

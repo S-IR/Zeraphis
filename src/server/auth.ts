@@ -47,7 +47,6 @@ export type AuthOption = "credentials" | "google" | "discord";
 export const authOptions: NextAuthOptions = {
   callbacks: {
     jwt: async ({ token, user }) => {
-      console.log('ran callback  code', user, token);
 
       if (user) {
         token.id = user.id;
@@ -59,7 +58,6 @@ export const authOptions: NextAuthOptions = {
     },
 
     session: ({ session, token }) => {
-      console.log('ran session code', session, token);
       
       return {
         ...session,

@@ -1,0 +1,1 @@
+export type ZeraphisS3Bucket= 'zeraphis-arabic-audio' |  'zeraphis-arabic-texts'
